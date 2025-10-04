@@ -1,0 +1,1418 @@
+/* AI太好用了，别的界面自己写写了将近一个星期，没想到ai写这个后台只用了5分钟，太喷了 */
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XYY魔方拓展管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .header {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .header-btn:hover {
+            background: #1557b0;
+            transform: translateY(-1px);
+        }
+
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .preview-container {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .preview-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .preview-sidebar {
+            background: #f5f5f5;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .preview-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .preview-group {
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .content-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .form-container {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .items-list {
+            background: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .list-header {
+            background: #f5f5f5;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-title {
+            font-weight: bold;
+        }
+
+        .list-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .icon-selector {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .icon-preview {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            min-height: 38px;
+        }
+
+        .icon-preview:hover {
+            border-color: #999;
+        }
+
+        .icon-preview i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .icon-preview-text {
+            flex: 1;
+            color: #666;
+        }
+
+        .icon-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            padding: 12px;
+        }
+
+        .icon-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .icon-option:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        .icon-option.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .icon-search {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .icon-search input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .icon-input-help {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-title {
+            font-weight: bold;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+
+        .status-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 3px;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            width: 500px;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="header-title" id="appTitle">XYY魔方拓展管理系统</h1>
+        <div class="header-actions">
+            <button onclick="loadSidebarData()" class="header-btn">
+                <i class="fas fa-sync-alt"></i> 刷新
+            </button>
+            <button onclick="saveSidebarData()" class="header-btn">
+                <i class="fas fa-save"></i> 保存
+            </button>
+            <button onclick="goBack()" class="header-btn">
+                <i class="fas fa-home"></i> 返回主页
+            </button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h2 class="sidebar-title">实时预览</h2>
+            <div class="preview-container">
+                <div class="preview-title">侧边栏预览</div>
+                <div class="preview-sidebar" id="previewSidebar">
+                    <div class="preview-item">主页</div>
+                    <div class="preview-group">用户菜单</div>
+                    <div class="preview-item">个人信息</div>
+                    <div class="preview-item">安全中心</div>
+                    <div class="preview-item">实名认证</div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h2 class="content-title">侧边栏配置</h2>
+                <button onclick="showAddModal()">添加项目</button>
+            </div>
+
+            <div class="form-container" id="viewSidebar">
+                <h3 style="margin-bottom: 16px;">添加新项目</h3>
+                <form id="addForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="itemName">项目名称</label>
+                            <input type="text" id="itemName" class="form-input" placeholder="例如：主页" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="itemType">项目类型</label>
+                            <select id="itemType" class="form-select" required>
+                                <option value="button">按钮</option>
+                                <option value="group">分组</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="itemIcon">图标</label>
+                            <div class="icon-selector">
+                                <div class="icon-preview" onclick="toggleIconDropdown('itemIcon')">
+                                    <i id="itemIconPreview" class="fas fa-home"></i>
+                                    <span class="icon-preview-text" id="itemIconText">选择图标</span>
+                                </div>
+                                <div class="icon-dropdown" id="itemIconDropdown">
+                                    <div class="icon-search">
+                                        <input type="text" placeholder="搜索或输入图标名称..." onkeyup="handleIconSearch('itemIcon', this.value)">
+                                        <div class="icon-input-help">输入图标名称如: eye, home, user 等</div>
+                                    </div>
+                                    <div class="icon-grid" id="itemIconGrid">
+                                        <!-- 图标选项将通过JavaScript动态生成 -->
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="itemIcon" value="fas fa-home">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="itemUrl">链接地址</label>
+                            <input type="text" id="itemUrl" class="form-input" placeholder="例如：content.html">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="display: none;">
+                        <label class="form-label" for="itemParent">父级分组</label>
+                        <select id="itemParent" class="form-select">
+                            <option value="">无（顶级项目）</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="itemOrder">排序</label>
+                        <input type="number" id="itemOrder" class="form-input" value="0" min="0">
+                    </div>
+                    
+                    <button type="submit">添加项目</button>
+                </form>
+            </div>
+
+            <div class="items-list" id="sidebarListBox">
+                <div class="list-header">
+                    <h3 class="list-title">当前配置</h3>
+                </div>
+                <div id="itemsList"></div>
+            </div>
+            
+            <div class="status-message" id="statusMessage"></div>
+            <div class="form-container" id="adminSettingsBox" style="display:none;">
+                <h3 style="margin-bottom: 16px;">广告管理</h3>
+                <div class="form-group">
+                    <label class="form-label">广告URL</label>
+                    <input type="text" id="adUrlInput" class="form-input" placeholder="https://...">
+                </div>
+                <button onclick="saveAdUrl()">保存广告URL</button>
+                <div class="status-message" id="settingsStatus"></div>
+            </div>
+
+            <div class="items-list" id="notifBox" style="display:none;">
+                <div class="list-header">
+                    <h3 class="list-title">公告管理</h3>
+                    <button onclick="openNotifEditor()">新增公告</button>
+                </div>
+                <div id="notifList"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑项目</h3>
+                <button class="modal-close" onclick="hideEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label class="form-label" for="editName">项目名称</label>
+                    <input type="text" id="editName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editType">项目类型</label>
+                    <select id="editType" class="form-select" required>
+                        <option value="button">按钮</option>
+                        <option value="group">分组</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editIcon">图标</label>
+                    <div class="icon-selector">
+                        <div class="icon-preview" onclick="toggleIconDropdown('editIcon')">
+                            <i id="editIconPreview" class="fas fa-home"></i>
+                            <span class="icon-preview-text" id="editIconText">选择图标</span>
+                        </div>
+                        <div class="icon-dropdown" id="editIconDropdown">
+                            <div class="icon-search">
+                                <input type="text" placeholder="搜索或输入图标名称..." onkeyup="handleIconSearch('editIcon', this.value)">
+                                <div class="icon-input-help">输入图标名称如: eye, home, user 等</div>
+                            </div>
+                            <div class="icon-grid" id="editIconGrid">
+                                <!-- 图标选项将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="editIcon" value="fas fa-home">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editUrl">链接地址</label>
+                    <input type="text" id="editUrl" class="form-input">
+                </div>
+                <div class="form-group" style="display: none;">
+                    <label class="form-label" for="editParent">父级分组</label>
+                    <select id="editParent" class="form-select">
+                        <option value="">无（顶级项目）</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editOrder">排序</label>
+                    <input type="number" id="editOrder" class="form-input" min="0">
+                </div>
+                <div>
+                    <button type="submit">保存修改</button>
+                    <button type="button" onclick="hideEditModal()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let sidebarData = [];
+        let editingId = null;
+        let isAdmin = false;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebarData();
+            setupFormHandlers();
+            checkLogin();
+            loadSettings();
+            loadNotifs();
+            initIconSelectors();
+            checkViewFromUrl();
+        });
+
+        // 初始化图标选择器
+        function initIconSelectors() {
+            // 完整的Font Awesome图标库（常用图标）
+            const allIcons = [
+                // 基础图标
+                'fas fa-home', 'fas fa-user', 'fas fa-cog', 'fas fa-chart-bar', 'fas fa-file-alt',
+                'fas fa-envelope', 'fas fa-phone', 'fas fa-calendar', 'fas fa-clock', 'fas fa-search',
+                'fas fa-download', 'fas fa-upload', 'fas fa-edit', 'fas fa-trash', 'fas fa-save',
+                'fas fa-plus', 'fas fa-minus', 'fas fa-check', 'fas fa-times', 'fas fa-info',
+                'fas fa-exclamation', 'fas fa-question', 'fas fa-star', 'fas fa-heart', 'fas fa-thumbs-up',
+                'fas fa-share', 'fas fa-link', 'fas fa-copy', 'fas fa-paste', 'fas fa-cut',
+                'fas fa-undo', 'fas fa-redo', 'fas fa-refresh', 'fas fa-sync', 'fas fa-power-off',
+                'fas fa-lock', 'fas fa-unlock', 'fas fa-key', 'fas fa-shield', 'fas fa-eye',
+                'fas fa-eye-slash', 'fas fa-bell', 'fas fa-bell-slash', 'fas fa-volume-up', 'fas fa-volume-down',
+                'fas fa-volume-mute', 'fas fa-play', 'fas fa-pause', 'fas fa-stop', 'fas fa-forward',
+                'fas fa-backward', 'fas fa-step-forward', 'fas fa-step-backward', 'fas fa-eject', 'fas fa-random',
+                'fas fa-repeat', 'fas fa-list', 'fas fa-th', 'fas fa-th-list', 'fas fa-table',
+                'fas fa-columns', 'fas fa-sort', 'fas fa-sort-up', 'fas fa-sort-down', 'fas fa-filter',
+                'fas fa-tags', 'fas fa-tag', 'fas fa-bookmark', 'fas fa-flag', 'fas fa-map-marker',
+                'fas fa-globe', 'fas fa-language', 'fas fa-font', 'fas fa-bold', 'fas fa-italic',
+                'fas fa-underline', 'fas fa-strikethrough', 'fas fa-align-left', 'fas fa-align-center', 'fas fa-align-right',
+                'fas fa-align-justify', 'fas fa-indent', 'fas fa-outdent', 'fas fa-list-ol', 'fas fa-list-ul',
+                'fas fa-quote-left', 'fas fa-quote-right', 'fas fa-code', 'fas fa-terminal', 'fas fa-desktop',
+                'fas fa-laptop', 'fas fa-tablet', 'fas fa-mobile', 'fas fa-server', 'fas fa-database',
+                'fas fa-cloud', 'fas fa-cloud-upload', 'fas fa-cloud-download', 'fas fa-wifi', 'fas fa-signal',
+                'fas fa-battery-full', 'fas fa-battery-three-quarters', 'fas fa-battery-half', 'fas fa-battery-quarter', 'fas fa-battery-empty',
+                'fas fa-plug', 'fas fa-lightbulb', 'fas fa-sun', 'fas fa-moon', 'fas fa-weather-sunny',
+                'fas fa-cloud-sun', 'fas fa-cloud-rain', 'fas fa-snowflake', 'fas fa-wind', 'fas fa-thermometer-half',
+                
+                // 更多常用图标
+                'fas fa-camera', 'fas fa-image', 'fas fa-video', 'fas fa-music', 'fas fa-headphones',
+                'fas fa-microphone', 'fas fa-microphone-slash', 'fas fa-video-slash', 'fas fa-camera-retro',
+                'fas fa-palette', 'fas fa-paint-brush', 'fas fa-brush', 'fas fa-fill-drip', 'fas fa-palette',
+                'fas fa-shopping-cart', 'fas fa-shopping-bag', 'fas fa-credit-card', 'fas fa-wallet', 'fas fa-money-bill',
+                'fas fa-coins', 'fas fa-gem', 'fas fa-gift', 'fas fa-trophy', 'fas fa-medal',
+                'fas fa-award', 'fas fa-certificate', 'fas fa-badge', 'fas fa-ribbon', 'fas fa-crown',
+                'fas fa-fire', 'fas fa-flame', 'fas fa-bolt', 'fas fa-zap', 'fas fa-lightning',
+                'fas fa-snowflake', 'fas fa-icicles', 'fas fa-wind', 'fas fa-tornado', 'fas fa-hurricane',
+                'fas fa-rainbow', 'fas fa-cloud-rainbow', 'fas fa-sun-cloud', 'fas fa-moon-cloud', 'fas fa-star-cloud',
+                
+                // 箭头和方向
+                'fas fa-arrow-up', 'fas fa-arrow-down', 'fas fa-arrow-left', 'fas fa-arrow-right',
+                'fas fa-arrow-up-right', 'fas fa-arrow-up-left', 'fas fa-arrow-down-right', 'fas fa-arrow-down-left',
+                'fas fa-arrows-alt', 'fas fa-arrows-alt-h', 'fas fa-arrows-alt-v', 'fas fa-expand', 'fas fa-compress',
+                'fas fa-expand-arrows-alt', 'fas fa-compress-arrows-alt', 'fas fa-external-link-alt', 'fas fa-external-link-square-alt',
+                
+                // 形状和符号
+                'fas fa-circle', 'fas fa-square', 'fas fa-triangle', 'fas fa-diamond', 'fas fa-hexagon',
+                'fas fa-octagon', 'fas fa-pentagon', 'fas fa-cross', 'fas fa-plus-circle', 'fas fa-minus-circle',
+                'fas fa-times-circle', 'fas fa-check-circle', 'fas fa-exclamation-circle', 'fas fa-question-circle',
+                'fas fa-info-circle', 'fas fa-ban', 'fas fa-times', 'fas fa-check', 'fas fa-plus',
+                
+                // 工具和功能
+                'fas fa-wrench', 'fas fa-screwdriver', 'fas fa-hammer', 'fas fa-tools', 'fas fa-toolbox',
+                'fas fa-cog', 'fas fa-cogs', 'fas fa-sliders-h', 'fas fa-sliders-v', 'fas fa-toggle-on',
+                'fas fa-toggle-off', 'fas fa-switch', 'fas fa-dial', 'fas fa-knob', 'fas fa-handle',
+                
+                // 通信和社交
+                'fas fa-comment', 'fas fa-comments', 'fas fa-comment-dots', 'fas fa-comment-alt', 'fas fa-comment-alt-dots',
+                'fas fa-reply', 'fas fa-reply-all', 'fas fa-forward', 'fas fa-share', 'fas fa-share-alt',
+                'fas fa-share-alt-square', 'fas fa-share-square', 'fas fa-retweet', 'fas fa-sync', 'fas fa-sync-alt',
+                
+                // 文件和文档
+                'fas fa-file', 'fas fa-file-alt', 'fas fa-file-archive', 'fas fa-file-audio', 'fas fa-file-code',
+                'fas fa-file-csv', 'fas fa-file-excel', 'fas fa-file-image', 'fas fa-file-pdf', 'fas fa-file-powerpoint',
+                'fas fa-file-video', 'fas fa-file-word', 'fas fa-folder', 'fas fa-folder-open', 'fas fa-folder-plus',
+                'fas fa-folder-minus', 'fas fa-folder-times', 'fas fa-folder-check', 'fas fa-archive', 'fas fa-box',
+                
+                // 医疗和健康
+                'fas fa-heart', 'fas fa-heartbeat', 'fas fa-heart-broken', 'fas fa-heart-circle', 'fas fa-heart-square',
+                'fas fa-hospital', 'fas fa-ambulance', 'fas fa-stethoscope', 'fas fa-user-md', 'fas fa-user-nurse',
+                'fas fa-pills', 'fas fa-prescription', 'fas fa-prescription-bottle', 'fas fa-prescription-bottle-alt',
+                'fas fa-thermometer', 'fas fa-thermometer-empty', 'fas fa-thermometer-quarter', 'fas fa-thermometer-half',
+                'fas fa-thermometer-three-quarters', 'fas fa-thermometer-full',
+                
+                // 教育和学习
+                'fas fa-graduation-cap', 'fas fa-school', 'fas fa-chalkboard', 'fas fa-chalkboard-teacher',
+                'fas fa-book', 'fas fa-book-open', 'fas fa-book-reader', 'fas fa-bookmark', 'fas fa-bookmark-alt',
+                'fas fa-pencil', 'fas fa-pencil-alt', 'fas fa-pen', 'fas fa-pen-alt', 'fas fa-pen-fancy',
+                'fas fa-pen-nib', 'fas fa-pen-square', 'fas fa-eraser', 'fas fa-highlighter', 'fas fa-marker',
+                
+                // 交通和旅行
+                'fas fa-car', 'fas fa-truck', 'fas fa-bus', 'fas fa-train', 'fas fa-plane',
+                'fas fa-helicopter', 'fas fa-rocket', 'fas fa-ship', 'fas fa-anchor', 'fas fa-compass',
+                'fas fa-map', 'fas fa-map-marker', 'fas fa-map-marker-alt', 'fas fa-map-pin', 'fas fa-map-signs',
+                'fas fa-route', 'fas fa-road', 'fas fa-street-view', 'fas fa-walking', 'fas fa-running',
+                'fas fa-bicycle', 'fas fa-motorcycle', 'fas fa-taxi', 'fas fa-uber', 'fas fa-lyft',
+                
+                // 食物和饮料
+                'fas fa-utensils', 'fas fa-utensil-spoon', 'fas fa-coffee', 'fas fa-mug-hot', 'fas fa-wine-glass',
+                'fas fa-wine-glass-alt', 'fas fa-beer', 'fas fa-cocktail', 'fas fa-martini-glass', 'fas fa-champagne-glasses',
+                'fas fa-apple-alt', 'fas fa-lemon', 'fas fa-orange', 'fas fa-banana', 'fas fa-grape',
+                'fas fa-strawberry', 'fas fa-watermelon', 'fas fa-pineapple', 'fas fa-peach', 'fas fa-cherry',
+                
+                // 动物和自然
+                'fas fa-dog', 'fas fa-cat', 'fas fa-horse', 'fas fa-cow', 'fas fa-pig', 'fas fa-sheep',
+                'fas fa-goat', 'fas fa-chicken', 'fas fa-duck', 'fas fa-turkey', 'fas fa-fish',
+                'fas fa-frog', 'fas fa-spider', 'fas fa-bug', 'fas fa-bee', 'fas fa-butterfly',
+                'fas fa-tree', 'fas fa-seedling', 'fas fa-leaf', 'fas fa-flower', 'fas fa-rose',
+                'fas fa-tulip', 'fas fa-sunflower', 'fas fa-cactus', 'fas fa-mountain', 'fas fa-hill',
+                
+                // 运动和娱乐
+                'fas fa-football', 'fas fa-basketball', 'fas fa-baseball', 'fas fa-soccer-ball', 'fas fa-volleyball',
+                'fas fa-tennis-ball', 'fas fa-golf-ball', 'fas fa-bowling-ball', 'fas fa-pool-ball', 'fas fa-dice',
+                'fas fa-dice-one', 'fas fa-dice-two', 'fas fa-dice-three', 'fas fa-dice-four', 'fas fa-dice-five',
+                'fas fa-dice-six', 'fas fa-chess', 'fas fa-chess-pawn', 'fas fa-chess-rook', 'fas fa-chess-knight',
+                'fas fa-chess-bishop', 'fas fa-chess-queen', 'fas fa-chess-king', 'fas fa-puzzle-piece', 'fas fa-gamepad',
+                
+                // 建筑和房屋
+                'fas fa-building', 'fas fa-home', 'fas fa-house', 'fas fa-house-user', 'fas fa-warehouse',
+                'fas fa-store', 'fas fa-store-alt', 'fas fa-shop', 'fas fa-mall', 'fas fa-industry',
+                'fas fa-factory', 'fas fa-office-building', 'fas fa-city', 'fas fa-landmark', 'fas fa-monument',
+                'fas fa-bridge', 'fas fa-road-bridge', 'fas fa-tunnel', 'fas fa-tower', 'fas fa-castle',
+                
+                // 科技和电子
+                'fas fa-microchip', 'fas fa-memory', 'fas fa-hard-drive', 'fas fa-solid-state-drive', 'fas fa-usb',
+                'fas fa-ethernet', 'fas fa-wifi', 'fas fa-bluetooth', 'fas fa-bluetooth-b', 'fas fa-nfc',
+                'fas fa-satellite', 'fas fa-satellite-dish', 'fas fa-broadcast-tower', 'fas fa-antenna', 'fas fa-router',
+                'fas fa-modem', 'fas fa-ethernet-cable', 'fas fa-usb-cable', 'fas fa-lightning-cable', 'fas fa-power-cord',
+                
+                // 安全和锁
+                'fas fa-lock', 'fas fa-unlock', 'fas fa-lock-open', 'fas fa-key', 'fas fa-key-skeleton',
+                'fas fa-fingerprint', 'fas fa-id-card', 'fas fa-id-badge', 'fas fa-passport', 'fas fa-visa',
+                'fas fa-shield', 'fas fa-shield-alt', 'fas fa-shield-check', 'fas fa-shield-times', 'fas fa-shield-exclamation',
+                'fas fa-shield-question', 'fas fa-shield-plus', 'fas fa-shield-minus', 'fas fa-shield-virus', 'fas fa-shield-cross',
+                
+                // 时间和日期
+                'fas fa-clock', 'fas fa-stopwatch', 'fas fa-timer', 'fas fa-hourglass', 'fas fa-hourglass-start',
+                'fas fa-hourglass-half', 'fas fa-hourglass-end', 'fas fa-calendar', 'fas fa-calendar-alt', 'fas fa-calendar-check',
+                'fas fa-calendar-day', 'fas fa-calendar-minus', 'fas fa-calendar-plus', 'fas fa-calendar-times', 'fas fa-calendar-week',
+                'fas fa-calendar-year', 'fas fa-calendar-range', 'fas fa-calendar-days', 'fas fa-calendar-lines', 'fas fa-calendar-lines-pen',
+                
+                // 更多实用图标
+                'fas fa-address-book', 'fas fa-address-card', 'fas fa-birthday-cake', 'fas fa-cake', 'fas fa-candy-cane',
+                'fas fa-gift', 'fas fa-gift-card', 'fas fa-gift-wrap', 'fas fa-present', 'fas fa-surprise',
+                'fas fa-party-horn', 'fas fa-confetti', 'fas fa-balloon', 'fas fa-balloons', 'fas fa-streamer',
+                'fas fa-banner', 'fas fa-flag', 'fas fa-flag-checkered', 'fas fa-flag-usa', 'fas fa-flag-un',
+                'fas fa-ribbon', 'fas fa-bow', 'fas fa-tie', 'fas fa-necktie', 'fas fa-scarf',
+                'fas fa-hat', 'fas fa-cap', 'fas fa-helmet', 'fas fa-mask', 'fas fa-glasses',
+                'fas fa-sunglasses', 'fas fa-goggles', 'fas fa-monocle', 'fas fa-spy', 'fas fa-detective',
+                
+                // 特殊符号和表情
+                'fas fa-smile', 'fas fa-smile-beam', 'fas fa-smile-wink', 'fas fa-smile-plus', 'fas fa-smile-tear',
+                'fas fa-frown', 'fas fa-frown-open', 'fas fa-meh', 'fas fa-meh-blank', 'fas fa-meh-rolling-eyes',
+                'fas fa-sad-tear', 'fas fa-sad-cry', 'fas fa-angry', 'fas fa-dizzy', 'fas fa-surprise',
+                'fas fa-grimace', 'fas fa-flushed', 'fas fa-squint', 'fas fa-squint-tears', 'fas fa-laugh',
+                'fas fa-laugh-beam', 'fas fa-laugh-squint', 'fas fa-laugh-wink', 'fas fa-kiss', 'fas fa-kiss-beam',
+                'fas fa-kiss-wink-heart', 'fas fa-kiss-closed-eyes', 'fas fa-heart', 'fas fa-heart-broken', 'fas fa-heart-circle',
+                'fas fa-heart-square', 'fas fa-heart-crack', 'fas fa-heart-pulse', 'fas fa-heart-half-stroke', 'fas fa-heart-half',
+                
+                // 更多专业图标
+                'fas fa-stethoscope', 'fas fa-x-ray', 'fas fa-microscope', 'fas fa-telescope', 'fas fa-binoculars',
+                'fas fa-camera', 'fas fa-video', 'fas fa-film', 'fas fa-clapperboard', 'fas fa-projector',
+                'fas fa-screen', 'fas fa-tv', 'fas fa-monitor', 'fas fa-display', 'fas fa-laptop',
+                'fas fa-keyboard', 'fas fa-mouse', 'fas fa-mouse-pointer', 'fas fa-hand-pointer', 'fas fa-hand-rock',
+                'fas fa-hand-paper', 'fas fa-hand-scissors', 'fas fa-hand-lizard', 'fas fa-hand-spock', 'fas fa-hand-peace',
+                'fas fa-hand-point-up', 'fas fa-hand-point-down', 'fas fa-hand-point-left', 'fas fa-hand-point-right',
+                'fas fa-thumbs-up', 'fas fa-thumbs-down', 'fas fa-thumbtack', 'fas fa-pushpin', 'fas fa-paperclip',
+                'fas fa-clipboard', 'fas fa-clipboard-check', 'fas fa-clipboard-list', 'fas fa-clipboard-user', 'fas fa-clipboard-question',
+                
+                // 最后一批常用图标
+                'fas fa-ellipsis', 'fas fa-ellipsis-h', 'fas fa-ellipsis-v', 'fas fa-dot-circle', 'fas fa-circle-dot',
+                'fas fa-bullseye', 'fas fa-target', 'fas fa-crosshairs', 'fas fa-location-dot', 'fas fa-location-pin',
+                'fas fa-location-arrow', 'fas fa-location-crosshairs', 'fas fa-location-check', 'fas fa-location-question',
+                'fas fa-location-exclamation', 'fas fa-location-plus', 'fas fa-location-minus', 'fas fa-location-times',
+                'fas fa-location-slash', 'fas fa-location-lock', 'fas fa-location-pen', 'fas fa-location-smile',
+                'fas fa-location-heart', 'fas fa-location-star', 'fas fa-location-diamond', 'fas fa-location-crown'
+            ];
+
+            // 为两个图标选择器生成图标网格
+            generateIconGrid('itemIcon', allIcons);
+            generateIconGrid('editIcon', allIcons);
+        }
+
+        // 生成图标网格
+        function generateIconGrid(selectorId, icons) {
+            const grid = document.getElementById(selectorId + 'Grid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            icons.forEach(iconClass => {
+                const option = document.createElement('div');
+                option.className = 'icon-option';
+                option.innerHTML = `<i class="${iconClass}"></i>`;
+                option.onclick = () => selectIcon(selectorId, iconClass);
+                grid.appendChild(option);
+            });
+        }
+
+        // 切换图标下拉菜单
+        function toggleIconDropdown(selectorId) {
+            const dropdown = document.getElementById(selectorId + 'Dropdown');
+            const isVisible = dropdown.style.display === 'block';
+            
+            // 关闭所有下拉菜单
+            document.querySelectorAll('.icon-dropdown').forEach(dd => {
+                dd.style.display = 'none';
+            });
+            
+            // 切换当前下拉菜单
+            if (!isVisible) {
+                dropdown.style.display = 'block';
+            }
+        }
+
+        // 选择图标
+        function selectIcon(selectorId, iconClass) {
+            const preview = document.getElementById(selectorId + 'Preview');
+            const text = document.getElementById(selectorId + 'Text');
+            const hiddenInput = document.getElementById(selectorId);
+            
+            preview.className = iconClass;
+            text.textContent = iconClass;
+            hiddenInput.value = iconClass;
+            
+            // 关闭下拉菜单
+            document.getElementById(selectorId + 'Dropdown').style.display = 'none';
+            
+            // 更新选中状态
+            const grid = document.getElementById(selectorId + 'Grid');
+            grid.querySelectorAll('.icon-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.querySelector('i').className === iconClass) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        // 处理图标搜索（支持输入图标名称）
+        function handleIconSearch(selectorId, searchTerm) {
+            const grid = document.getElementById(selectorId + 'Grid');
+            if (!grid) return;
+
+            // 如果搜索词为空，显示所有图标
+            if (!searchTerm.trim()) {
+                grid.querySelectorAll('.icon-option').forEach(option => {
+                    option.style.display = 'flex';
+                });
+                return;
+            }
+
+            const searchLower = searchTerm.toLowerCase().trim();
+            
+            // 如果输入的是完整的图标类名（如 "fas fa-eye"），直接搜索
+            if (searchLower.includes('fa-')) {
+                grid.querySelectorAll('.icon-option').forEach(option => {
+                    const iconClass = option.querySelector('i').className.toLowerCase();
+                    const isVisible = iconClass.includes(searchLower);
+                    option.style.display = isVisible ? 'flex' : 'none';
+                });
+                return;
+            }
+
+            // 如果输入的是图标名称（如 "eye"），搜索包含该名称的图标
+            grid.querySelectorAll('.icon-option').forEach(option => {
+                const iconClass = option.querySelector('i').className.toLowerCase();
+                const iconName = iconClass.replace('fas fa-', '').replace('far fa-', '').replace('fab fa-', '');
+                const isVisible = iconName.includes(searchLower) || iconClass.includes(searchLower);
+                option.style.display = isVisible ? 'flex' : 'none';
+            });
+        }
+
+        // 点击外部关闭下拉菜单
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.icon-selector')) {
+                document.querySelectorAll('.icon-dropdown').forEach(dd => {
+                    dd.style.display = 'none';
+                });
+            }
+        });
+
+        // 设置表单处理器
+        function setupFormHandlers() {
+            document.getElementById('addForm').addEventListener('submit', handleAddItem);
+            document.getElementById('editForm').addEventListener('submit', handleEditItem);
+        }
+
+        async function checkLogin(){
+            try{
+                // 首先检查是否已经登录
+                const meResponse = await fetch('api.php?action=me');
+                const meData = await meResponse.json();
+                
+                if(meData && meData.success && meData.data && meData.data.admin) {
+                    // 已经登录，直接返回
+                    isAdmin = true;
+                    return;
+                }
+                
+                // 未登录，要求输入密码
+                const pwd = prompt('请输入管理员密码：');
+                if(pwd===null){ 
+                    window.location.href = 'admin_home.html';
+                    return; 
+                }
+                const lr = await fetch('api.php?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+                const lj = await lr.json();
+                if(!(lj && lj.success)){ 
+                    alert(lj.message||'登录失败');
+                    window.location.href = 'admin_home.html';
+                } else {
+                    isAdmin = true;
+                }
+            }catch(e){ 
+                console.warn('登录失败',e);
+                alert('登录失败，请重试');
+                window.location.href = 'admin_home.html';
+            }
+        }
+
+        async function loadSettings(){
+            try{
+                const r = await fetch('api.php?action=getSettings');
+                const j = await r.json();
+                if(j && j.success && j.data){
+                    document.getElementById('adUrlInput').value = j.data.ad_url || '';
+                }
+            }catch(e){ console.warn('读取设置失败',e); }
+        }
+
+        async function saveAdUrl(){
+            const adUrl = document.getElementById('adUrlInput').value.trim();
+            try{
+                const r = await fetch('api.php?action=saveSettings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ad_url:adUrl})});
+                const j = await r.json();
+                if(j && j.success){ showSettingsStatus('保存成功','success'); } else { showSettingsStatus(j.message||'保存失败','error'); }
+            }catch(e){ showSettingsStatus('保存失败:'+e.message,'error'); }
+        }
+
+        function showSettingsStatus(msg,type){
+            const el = document.getElementById('settingsStatus');
+            el.className = 'status-message status-'+type;
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(()=>{ el.style.display='none'; },2500);
+        }
+
+        function switchView(view){
+            // 隐藏所有视图
+            document.getElementById('viewSidebar').style.display = 'none';
+            document.getElementById('sidebarListBox').style.display = 'none';
+            document.getElementById('notifBox').style.display = 'none';
+            document.getElementById('adminSettingsBox').style.display = 'none';
+            
+            // 根据view参数显示对应视图
+            switch(view) {
+                case 'sidebar':
+                    document.getElementById('viewSidebar').style.display = 'block';
+                    document.getElementById('sidebarListBox').style.display = 'block';
+                    break;
+                case 'announcement':
+                case 'notifs':
+                    document.getElementById('notifBox').style.display = 'block';
+                    break;
+                case 'advertisement':
+                case 'ads':
+                    document.getElementById('adminSettingsBox').style.display = 'block';
+                    break;
+                case 'password':
+                    // 密码管理通过点击标题触发，这里不需要显示特定视图
+                    break;
+                default:
+                    // 默认显示侧边栏管理
+                    document.getElementById('viewSidebar').style.display = 'block';
+                    document.getElementById('sidebarListBox').style.display = 'block';
+                    break;
+            }
+        }
+
+        // 检查URL参数并切换视图
+        function checkViewFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get('view');
+            if (view) {
+                switchView(view);
+            }
+        }
+
+        // 返回主页
+        function goBack() {
+            window.location.href = 'admin_home.html';
+        }
+
+        // 隐藏入口：点标题5次触发密码修改
+        let titleTapCount = 0; let titleTapTimer = null;
+        document.getElementById('appTitle').addEventListener('click', () => {
+            titleTapCount++;
+            clearTimeout(titleTapTimer);
+            titleTapTimer = setTimeout(()=>{ titleTapCount = 0; }, 1200);
+            if(titleTapCount >= 5){ titleTapCount = 0; openPasswordChange(); }
+        });
+
+        async function openPasswordChange(){
+            const oldPwd = prompt('请输入当前管理员密码以修改：');
+            if(oldPwd===null) return;
+            try{
+                const lr = await fetch('api.php?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:oldPwd})});
+                const lj = await lr.json();
+                if(!(lj && lj.success)){ alert(lj.message||'原密码验证失败'); return; }
+                const np = prompt('请输入新密码：');
+                if(np===null || np==='') return;
+                const np2 = prompt('请再次输入新密码：');
+                if(np2===null || np2==='') return;
+                if(np!==np2){ alert('两次输入不一致'); return; }
+                const r = await fetch('api.php?action=saveSettings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({new_password:np})});
+                const j = await r.json();
+                if(j && j.success){ alert('密码修改成功'); } else { alert(j.message||'密码修改失败'); }
+            }catch(e){ alert('操作失败:'+e.message); }
+        }
+
+        async function loadNotifs(){
+            try{
+                const r = await fetch('api.php?action=listNotifications');
+                const j = await r.json();
+                const list = document.getElementById('notifList');
+                list.innerHTML = '';
+                if(j && j.success && Array.isArray(j.data)){
+                    j.data.forEach(n=>{
+                        const row = document.createElement('div');
+                        row.className='list-item';
+                        row.innerHTML = `<div class="item-details"><div class="item-title">${n.title}</div><div class="item-meta">${n.is_active? '启用':'停用'} | #${n.id}</div></div><div class="item-actions"><button onclick="openNotifEditor(${n.id}, \`${n.title.replace(/`/g,'\\`')}\`, \`${String(n.message||'').replace(/`/g,'\\`')}\`, ${n.is_active?1:0})">编辑</button><button onclick="delNotif(${n.id})">删除</button></div>`;
+                        list.appendChild(row);
+                    });
+                }
+            }catch(e){ console.warn('加载公告失败',e); }
+        }
+
+        function openNotifEditor(id=0, title='', message='', is_active=1){
+            const t = prompt('公告标题：', title||'');
+            if(t===null) return;
+            const m = prompt('公告内容（支持HTML）：', message||'');
+            if(m===null) return;
+            const ena = confirm('是否启用该公告？ 确定=启用 / 取消=停用');
+            saveNotif({id, title:t, message:m, is_active: ena?1:0});
+        }
+
+        async function saveNotif(data){
+            try{
+                const r = await fetch('api.php?action=saveNotification',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+                const j = await r.json();
+                if(j && j.success){ loadNotifs(); } else { alert(j.message||'保存失败'); }
+            }catch(e){ alert('保存失败:'+e.message); }
+        }
+
+        async function delNotif(id){
+            if(!confirm('确定删除该公告？')) return;
+            try{
+                const r = await fetch('api.php?action=deleteNotification&id='+id,{method:'DELETE'});
+                const j = await r.json();
+                if(j && j.success){ loadNotifs(); } else { alert(j.message||'删除失败'); }
+            }catch(e){ alert('删除失败:'+e.message); }
+        }
+
+        // 加载侧边栏数据
+        async function loadSidebarData() {
+            try {
+                const response = await fetch('api.php?action=get');
+                const result = await response.json();
+                
+                if (result.success) {
+                    sidebarData = result.data;
+                    updateItemsList();
+                    updatePreview();
+                    updateParentSelects();
+                } else {
+                    showStatus('加载数据失败: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showStatus('加载数据失败: ' + error.message, 'error');
+            }
+        }
+
+        // 保存侧边栏数据
+        async function saveSidebarData() {
+            try {
+                const response = await fetch('api.php?action=save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data: sidebarData })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('配置保存成功！', 'success');
+                } else {
+                    showStatus('保存失败: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showStatus('保存失败: ' + error.message, 'error');
+            }
+        }
+
+        // 处理添加项目
+        function handleAddItem(e) {
+            e.preventDefault();
+            
+            const newItem = {
+                name: document.getElementById('itemName').value,
+                type: document.getElementById('itemType').value,
+                title: document.getElementById('itemName').value,
+                icon: document.getElementById('itemIcon').value,
+                url: document.getElementById('itemUrl').value,
+                parent_id: (document.getElementById('itemParent').value || null) ? Number(document.getElementById('itemParent').value) : null,
+                sort_order: (function(){
+                    const val = parseInt(document.getElementById('itemOrder').value);
+                    if(!isNaN(val)) return val;
+                    const pid = (document.getElementById('itemParent').value || '')==='' ? null : Number(document.getElementById('itemParent').value);
+                    let maxOrder = -1;
+                    sidebarData.forEach(it=>{
+                        const sameParent = (it.parent_id==null? null: Number(it.parent_id)) === (pid==null? null: Number(pid));
+                        if(sameParent){
+                            const so = Number(it.sort_order)||0;
+                            if(so>maxOrder) maxOrder=so;
+                        }
+                    });
+                    return maxOrder+1;
+                })(),
+                is_active: 1
+            };
+            
+            sidebarData.push(newItem);
+            updateItemsList();
+            updatePreview();
+            updateParentSelects();
+            
+            // 清空表单
+            document.getElementById('addForm').reset();
+            document.getElementById('itemOrder').value = 0;
+            
+            showStatus('项目添加成功！', 'success');
+        }
+
+        // 处理编辑项目
+        function handleEditItem(e) {
+            e.preventDefault();
+            
+            const index = sidebarData.findIndex(item => String(item.id||item.name) === String(editingId));
+            if (index !== -1) {
+                sidebarData[index] = {
+                    ...sidebarData[index],
+                    name: document.getElementById('editName').value,
+                    type: document.getElementById('editType').value,
+                    title: document.getElementById('editName').value,
+                    icon: document.getElementById('editIcon').value,
+                    url: document.getElementById('editUrl').value,
+                    parent_id: (document.getElementById('editParent').value===''? null : Number(document.getElementById('editParent').value)),
+                    sort_order: (function(){
+                        const val = parseInt(document.getElementById('editOrder').value);
+                        if(!isNaN(val)) return val;
+                        const pid = (document.getElementById('editParent').value||'')==='' ? null : Number(document.getElementById('editParent').value);
+                        let maxOrder = -1;
+                        sidebarData.forEach(it=>{
+                            const sameParent = (it.parent_id==null? null: Number(it.parent_id)) === (pid==null? null: Number(pid));
+                            if(sameParent){
+                                const so = Number(it.sort_order)||0;
+                                if(so>maxOrder) maxOrder=so;
+                            }
+                        });
+                        return maxOrder+1;
+                    })()
+                };
+                
+                updateItemsList();
+                updatePreview();
+                updateParentSelects();
+                hideEditModal();
+                
+                showStatus('项目修改成功！', 'success');
+            }
+        }
+
+        // 更新项目列表显示
+        function updateItemsList() {
+            const container = document.getElementById('itemsList');
+            container.innerHTML = '';
+
+            // 规范化 & 分组
+            const normalized = sidebarData.map((it, idx) => {
+                const idNum = (it.id !== undefined && it.id !== null && it.id !== '') && !isNaN(Number(it.id)) ? Number(it.id) : it.id;
+                let pidNum = null;
+                if (!(it.parent_id === '' || it.parent_id === null || it.parent_id === undefined)) {
+                    const tryNum = Number(it.parent_id);
+                    pidNum = isNaN(tryNum) ? null : tryNum;
+                }
+                return {
+                    ...it,
+                    __idx: idx,
+                    id: idNum,
+                    parent_id: pidNum,
+                    sort_order: Number(it.sort_order) || 0
+                };
+            });
+
+            const childrenMap = new Map();
+            // 仅允许指向存在且为分组/下拉分组的父级，否则视为顶级
+            const validParentIds = new Set(normalized.filter(x => (x.type==='group' || x.type==='dropdown') && typeof x.id === 'number').map(x => x.id));
+
+            normalized.forEach(it => {
+                const pid = (it.parent_id != null && validParentIds.has(it.parent_id)) ? it.parent_id : 0;
+                if (!childrenMap.has(pid)) childrenMap.set(pid, []);
+                childrenMap.get(pid).push(it);
+            });
+
+            // 顶级（含独立按钮/分组/下拉）
+            const topLevel = (childrenMap.get(0) || []).sort((a,b)=>a.sort_order-b.sort_order);
+
+            topLevel.forEach(item => {
+                if (item.type === 'group' || item.type === 'dropdown') {
+                    const section = document.createElement('div');
+                    section.className = 'list-item';
+                    section.setAttribute('draggable','true');
+                    section.dataset.index = String(item.__idx);
+                    section.dataset.type = item.type;
+                    section.innerHTML = `
+                        <div class="item-info">
+                            <span class="item-icon">${item.icon ? `<i class="${item.icon}"></i>` : (item.type==='group'?'[G]':'[D]')}</span>
+                            <div class="item-details">
+                                <div class="item-title">${item.title} <span style="color:#5f6368;font-size:12px;">(${item.type==='group'?'分组':'下拉分组'})</span></div>
+                                <div class="item-meta">排序: ${item.sort_order}</div>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button onclick="editItem(${item.__idx})">编辑</button>
+                            <button onclick="deleteItem(${item.__idx})">删除</button>
+                        </div>
+                    `;
+
+                    // 子按钮容器
+                    const childWrap = document.createElement('div');
+                    childWrap.style.marginLeft = '24px';
+                    const children = (childrenMap.get(item.id) || []).filter(x=>x.type==='button').sort((a,b)=>a.sort_order-b.sort_order);
+                    children.forEach(btn => {
+                        const row = document.createElement('div');
+                        row.className = 'list-item';
+                        row.setAttribute('draggable','true');
+                        row.dataset.index = String(btn.__idx);
+                        row.dataset.type = 'button';
+                        row.innerHTML = `
+                            <div class="item-info">
+                                <span class="item-icon">${btn.icon || ''}</span>
+                                <div class="item-details">
+                                    <div class="item-title">${btn.title}</div>
+                                    <div class="item-meta">父级 #${item.id} | 排序: ${btn.sort_order} | ${btn.url || '无链接'}</div>
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="editItem(${btn.__idx})">编辑</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteItem(${btn.__idx})">删除</button>
+                            </div>
+                        `;
+                        childWrap.appendChild(row);
+                    });
+
+                    section.appendChild(childWrap);
+                    container.appendChild(section);
+                } else if (item.type === 'button') {
+                    // 顶级独立按钮
+                    const row = document.createElement('div');
+                    row.className = 'list-item';
+                    row.setAttribute('draggable','true');
+                    row.dataset.index = String(item.__idx);
+                    row.dataset.type = 'button';
+                    row.innerHTML = `
+                        <div class="item-info">
+                            <span class="item-icon">${item.icon ? `<i class="${item.icon}"></i>` : ''}</span>
+                            <div class="item-details">
+                                <div class="item-title">${item.title}</div>
+                                <div class="item-meta">排序: ${item.sort_order} | ${item.url || '无链接'}</div>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button onclick="editItem(${item.__idx})">编辑</button>
+                            <button onclick="deleteItem(${item.__idx})">删除</button>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                }
+            });
+
+            // 拖动逻辑已取消
+        }
+        
+
+        // 更新预览
+        function updatePreview() {
+            const container = document.getElementById('previewSidebar');
+            container.innerHTML = '';
+
+            // 规范化并分组
+            const normalized = sidebarData.map(it => ({
+                ...it,
+                id: (it.id!==undefined && it.id!==null && it.id!=='') && !isNaN(Number(it.id)) ? Number(it.id) : it.id,
+                parent_id: (it.parent_id===null || it.parent_id===undefined || it.parent_id==='') ? null : Number(it.parent_id),
+                sort_order: Number(it.sort_order)||0
+            }));
+
+            // 排序规则：parent_id, sort_order, id
+            normalized.sort((a,b)=>{
+                const pa = a.parent_id||0, pb = b.parent_id||0;
+                if (pa!==pb) return pa-pb;
+                if (a.sort_order!==b.sort_order) return a.sort_order-b.sort_order;
+                return (Number(a.id)||0)-(Number(b.id)||0);
+            });
+
+            const byParent = new Map();
+            normalized.forEach(it=>{
+                const pid = (it.parent_id==null? 0 : it.parent_id);
+                if (!byParent.has(pid)) byParent.set(pid, []);
+                byParent.get(pid).push(it);
+            });
+
+            const top = byParent.get(0)||[];
+
+            // 带排序号的小工具
+            const getOrderBadge = (n)=>`<span style="color:#5f6368;font-size:12px;margin-left:8px;">#${n}</span>`;
+
+            top.forEach((item, idxTop) => {
+                if (item.type === 'group') {
+                    // 分组标题
+                    const groupTitle = document.createElement('div');
+                    groupTitle.className = 'preview-group';
+                    groupTitle.innerHTML = `${item.title}${getOrderBadge(item.sort_order)}`;
+                    container.appendChild(groupTitle);
+
+                    // 子按钮
+                    const children = (byParent.get(item.id)||[]).filter(x=>x.type==='button')
+                        .sort((a,b)=>a.sort_order-b.sort_order);
+                    children.forEach((btn, idx)=>{
+                        const row = document.createElement('div');
+                        row.className = 'preview-item';
+                        row.innerHTML = `${btn.icon? `<i class="${btn.icon}"></i> ` : ''}${btn.title}${getOrderBadge(btn.sort_order)}`;
+                        container.appendChild(row);
+                    });
+                } else if (item.type === 'dropdown') {
+                    // 下拉分组头
+                    const dropHead = document.createElement('div');
+                    dropHead.className = 'preview-item';
+                    dropHead.innerHTML = `${item.icon? `<i class="${item.icon}"></i> ` : ''}${item.title}${getOrderBadge(item.sort_order)} \u25BC`;
+                    container.appendChild(dropHead);
+
+                    // 子按钮（无图标展示）
+                    const children = (byParent.get(item.id)||[]).filter(x=>x.type==='button')
+                        .sort((a,b)=>a.sort_order-b.sort_order);
+                    children.forEach(btn=>{
+                        const row = document.createElement('div');
+                        row.className = 'preview-item';
+                        row.style.paddingLeft = '24px';
+                        row.innerHTML = `${btn.title}${getOrderBadge(btn.sort_order)}`;
+                        container.appendChild(row);
+                    });
+                } else if (item.type === 'button') {
+                    const row = document.createElement('div');
+                    row.className = 'preview-item';
+                    row.innerHTML = `${item.icon? `<i class="${item.icon}"></i> ` : ''}${item.title}${getOrderBadge(item.sort_order)}`;
+                    container.appendChild(row);
+                }
+            });
+        }
+
+        // 更新父级选择器
+        function updateParentSelects() {
+            const addParent = document.getElementById('itemParent');
+            const editParent = document.getElementById('editParent');
+            
+            // 清空现有选项（保留"无"选项）
+            addParent.innerHTML = '<option value="">无（顶级项目）</option>';
+            editParent.innerHTML = '<option value="">无（顶级项目）</option>';
+            
+            // 仅允许选择“已保存到数据库、具有 id 的分组/下拉分组”作为父级
+            sidebarData.forEach(item => {
+                if ((item.type === 'group' || item.type === 'dropdown') && item.id) {
+                    const option1 = document.createElement('option');
+                    option1.value = item.id; // 强制使用数据库 id
+                    option1.textContent = item.title;
+                    addParent.appendChild(option1);
+
+                    const option2 = document.createElement('option');
+                    option2.value = item.id;
+                    option2.textContent = item.title;
+                    editParent.appendChild(option2);
+                }
+            });
+        }
+
+        // 编辑项目
+        function editItem(index) {
+            const item = sidebarData[index];
+            editingId = item.id || item.name;
+            
+            document.getElementById('editId').value = editingId;
+            document.getElementById('editName').value = item.name;
+            document.getElementById('editType').value = item.type;
+            
+            // 设置Font Awesome图标
+            const iconClass = item.icon || 'fas fa-home';
+            document.getElementById('editIcon').value = iconClass;
+            document.getElementById('editIconPreview').className = iconClass;
+            document.getElementById('editIconText').textContent = iconClass;
+            
+            document.getElementById('editUrl').value = item.url || '';
+            document.getElementById('editParent').value = (item.parent_id==null? '': item.parent_id);
+            document.getElementById('editOrder').value = item.sort_order || 0;
+            
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        // 删除项目
+        function deleteItem(index) {
+            if (confirm('确定要删除这个项目吗？')) {
+                sidebarData.splice(index, 1);
+                updateItemsList();
+                updatePreview();
+                updateParentSelects();
+                showStatus('项目删除成功！', 'success');
+            }
+        }
+
+        // 显示编辑模态框
+        function showAddModal() {
+            // 这里可以添加添加模态框的逻辑
+        }
+
+        // 隐藏编辑模态框
+        function hideEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            editingId = null;
+        }
+
+        // 显示状态消息
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.className = `status-message status-${type}`;
+            statusElement.textContent = message;
+            statusElement.style.display = 'block';
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
