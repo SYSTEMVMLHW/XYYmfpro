@@ -52,7 +52,7 @@ XYYmfPro 是一个基于 **智简魔方财务系统** 的前端功能拓展项�
 
 ### 3️⃣ 后台配置
 
-在 `config.php` 内配置你的魔方 API 连接信息
+替换所有的app2.ceshi.cs为你自己的魔方财务域名
 
 ---
 
@@ -116,3 +116,4 @@ XYYmfpro-main/
 
 博客：[黯の小站](https://www.an25.asia)
 云：[轩逸云](https://app1.xuanyiy.cn)
+
