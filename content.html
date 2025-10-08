@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户中心 - 主内容</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #202124;
+            line-height: 1.5;
+            padding: 24px;
+        }
+
+        .welcome-section {
+            margin-bottom: 32px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            color: #5f6368;
+            font-size: 16px;
+        }
+
+        /* 主内容布局 */
+        .main-layout {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .left-column {
+            flex: 0 0 400px;
+            min-width: 300px;
+        }
+
+        .right-column {
+            flex: 0 0 450px;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* 数据看板 */
+        .dashboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .dashboard-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #4285f4;
+            transition: width 0.3s ease;
+        }
+
+        .dashboard-card:hover::before {
+            width: 8px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* 卡片内容布局 */
+        .card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-action {
+            margin-left: 16px;
+        }
+
+        /* 充值按钮样式 */
+        .recharge-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .recharge-btn:hover {
+            background: #3367d6;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+        }
+
+        .recharge-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(66, 133, 244, 0.3);
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #5f6368;
+        }
+
+        /* 图片占位框 */
+        .image-placeholder {
+            background: #fff;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 公告区域 */
+        .announcement-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-height: 400px;
+        }
+
+        .announcement-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 16px;
+        }
+
+        .announcement-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .announcement-item {
+            padding: 12px 16px;
+            border: 1px solid #f1f3f4;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 50px;
+            user-select: none;
+        }
+
+        .announcement-item:hover {
+            background-color: #f8f9fa;
+            border-color: #e91e63;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(233, 30, 99, 0.1);
+        }
+
+        .announcement-item:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(233, 30, 99, 0.2);
+        }
+
+        .announcement-item-label {
+            font-size: 12px;
+            color: #9aa0a6;
+            background: #f1f3f4;
+            padding: 4px 8px;
+            border-radius: 12px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .announcement-item-title {
+            font-size: 14px;
+            color: #e91e63;
+            font-weight: 500;
+            line-height: 1.4;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 滚动条样式 */
+        .announcement-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .announcement-list::-webkit-scrollbar-track {
+            background: #f1f3f4;
+            border-radius: 2px;
+        }
+
+        .announcement-list::-webkit-scrollbar-thumb {
+            background: #dadce0;
+            border-radius: 2px;
+        }
+
+        .announcement-list::-webkit-scrollbar-thumb:hover {
+            background: #9aa0a6;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .main-layout {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .left-column {
+                flex: 1;
+                min-width: unset;
+            }
+
+            .right-column {
+                flex: 1;
+                min-width: unset;
+                width: 100%;
+            }
+
+            .announcement-item {
+                min-height: 45px;
+                padding: 10px 14px;
+            }
+
+            .announcement-item-title {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .main-layout {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .left-column {
+                flex: 1;
+                min-width: unset;
+                width: 100%;
+            }
+
+            .right-column {
+                flex: 1;
+                min-width: unset;
+                width: 100%;
+            }
+
+            .dashboard-grid {
+                width: 100%;
+            }
+
+            .dashboard-card {
+                width: 100%;
+                padding: 20px;
+            }
+
+            .card-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .card-action {
+                margin-left: 0;
+                align-self: flex-end;
+            }
+
+            .recharge-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+
+            .welcome-title {
+                font-size: 24px;
+            }
+
+            .card-value {
+                font-size: 28px;
+            }
+
+            .announcement-item {
+                min-height: 40px;
+                padding: 10px 12px;
+            }
+
+            .announcement-item-title {
+                font-size: 12px;
+            }
+
+            .announcement-item-label {
+                font-size: 11px;
+                padding: 3px 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .welcome-title {
+                font-size: 20px;
+            }
+
+            .card-value {
+                font-size: 24px;
+            }
+
+            .announcement-section {
+                padding: 16px;
+            }
+
+            .image-placeholder {
+                height: 150px;
+            }
+
+            .dashboard-card {
+                padding: 16px;
+            }
+
+            .announcement-item {
+                min-height: 35px;
+                padding: 8px 10px;
+            }
+
+            .announcement-item-title {
+                font-size: 11px;
+            }
+
+            .announcement-item-label {
+                font-size: 10px;
+                padding: 2px 6px;
+            }
+        }
+
+        /* 提示框样式 */
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        .notification-box {
+            background: #fff8e1;
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            pointer-events: auto;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            background: #ff9800;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+            color: #e65100;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: color 0.2s;
+        }
+
+        .notification-close:hover {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- 欢迎区域 -->
+    <section class="welcome-section">
+        <h1 class="welcome-title" id="welcomeTitle">欢迎回来，<span id="userName">用户</span>！</h1>
+        <p class="welcome-subtitle" id="greetingMessage">正在加载问候语...</p>
+    </section>
+
+    <!-- 主布局 -->
+    <div class="main-layout">
+        <!-- 左侧：数据看板 -->
+        <div class="left-column">
+            <div class="dashboard-grid">
+                <div class="dashboard-card" onclick="showNotification()">
+                    <div class="card-title">产品总数</div>
+                    <div class="card-value" id="productTotal">-</div>
+                    <div class="card-subtitle">个产品</div>
+                </div>
+                <div class="dashboard-card" onclick="showNotification()">
+                    <div class="card-title">消息总数</div>
+                    <div class="card-value" id="messageTotal">-</div>
+                    <div class="card-subtitle">条消息</div>
+                </div>
+                <div class="dashboard-card" onclick="showNotification()">
+                    <div class="card-title">投诉总数</div>
+                    <div class="card-value" id="ticketTotal">-</div>
+                    <div class="card-subtitle">个投诉</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-content">
+                        <div class="card-info">
+                            <div class="card-title">账户余额</div>
+                            <div class="card-value" id="creditAmount">-</div>
+                            <div class="card-subtitle">积分</div>
+                        </div>
+                        <div class="card-action">
+                            <button class="recharge-btn" onclick="openRechargePage()">充值</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：图片占位框和公告区域 -->
+        <div class="right-column">
+            <div class="image-placeholder">
+                <img src="" alt="随机图片" id="greetingImage">
+            </div>
+            <section class="announcement-section">
+                <h2 class="announcement-title">最新公告</h2>
+                <div class="announcement-list" id="announcementList">
+                    <div class="announcement-item">
+                        <div class="announcement-item-label">正在加载...</div>
+                        <div class="announcement-item-title">请稍候</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // API配置
+        const API_BASE_URL = 'https://app2.ceshi.cs';
+        let jwtToken = localStorage.getItem('jwt_token');
+
+        // 通用API请求函数
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const config = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(jwtToken && { 'Authorization': `Bearer ${jwtToken}` })
+                },
+                ...options
+            };
+
+            try {
+                const response = await fetch(url, config);
+                const data = await response.json();
+                
+                if (data.status === 405) {
+                    // 通知父页面跳转到登录页面
+                    if (window.parent && window.parent.redirectToLogin) {
+                        window.parent.redirectToLogin();
+                    }
+                    throw new Error('需要登录');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('API请求失败:', error);
+                throw error;
+            }
+        }
+
+        // 加载用户信息
+        async function loadUserInfo() {
+            try {
+                const data = await apiRequest('/user_info');
+                const userNameElement = document.getElementById('userName');
+                if (userNameElement) {
+                    userNameElement.textContent = data.user?.username || '用户';
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+
+        // 加载问候语
+        async function loadGreeting() {
+            try {
+                const response = await fetch('https://api.kuleu.com/api/getGreetingMessage');
+                const text = await response.text();
+                document.getElementById('greetingMessage').textContent = text || '欢迎使用用户中心！';
+            } catch (error) {
+                console.error('加载问候语失败:', error);
+                document.getElementById('greetingMessage').textContent = '欢迎使用用户中心！';
+            }
+        }
+
+        // 加载问候图片
+        async function loadGreetingImage() {
+            try {
+                const imageUrl = 'https://www.loliapi.com/acg/';
+                document.getElementById('greetingImage').src = imageUrl;
+            } catch (error) {
+                console.error('加载问候图片失败:', error);
+            }
+        }
+
+        // 加载数据看板
+        async function loadDashboardData() {
+            try {
+                // 加载产品总数
+                const hostsData = await apiRequest('/v1/hosts');
+                document.getElementById('productTotal').textContent = hostsData.data?.total || '0';
+
+                // 加载消息总数
+                const messageData = await apiRequest('/v1/message');
+                document.getElementById('messageTotal').textContent = messageData.data?.total || '0';
+
+                // 加载投诉总数
+                const ticketsData = await apiRequest('/v1/tickets');
+                document.getElementById('ticketTotal').textContent = ticketsData.data?.total || '0';
+
+                // 加载财务余额
+                const fundsData = await apiRequest('/v1/funds');
+                document.getElementById('creditAmount').textContent = fundsData.data?.credit || '0';
+            } catch (error) {
+                console.error('加载看板数据失败:', error);
+            }
+        }
+
+        // 加载公告
+        async function loadAnnouncements() {
+            try {
+                const data = await apiRequest('/v1/news');
+                const announcementList = document.getElementById('announcementList');
+                
+                if (data.data?.news && Array.isArray(data.data.news) && data.data.news.length > 0) {
+                    let html = '';
+                    data.data.news.forEach(newsItem => {
+                        const label = newsItem.label || '公告';
+                        const title = newsItem.title || '无标题';
+                        const newsId = newsItem.id || '';
+                        html += `
+                            <div class="announcement-item" data-news-id="${newsId}" onclick="openNewsDetail(${newsId})">
+                                <div class="announcement-item-label">${label}</div>
+                                <div class="announcement-item-title">${title}</div>
+                            </div>
+                        `;
+                    });
+                    announcementList.innerHTML = html;
+                } else {
+                    announcementList.innerHTML = `
+                        <div class="announcement-item">
+                            <div class="announcement-item-label">暂无公告</div>
+                            <div class="announcement-item-title">当前没有新的公告信息</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('加载公告失败:', error);
+                document.getElementById('announcementList').innerHTML = `
+                    <div class="announcement-item">
+                        <div class="announcement-item-label">加载失败</div>
+                        <div class="announcement-item-title">无法加载公告信息</div>
+                    </div>
+                `;
+            }
+        }
+
+        // 打开新闻详情
+        function openNewsDetail(newsId) {
+            if (newsId) {
+                const newsUrl = `https://app2.ceshi.cs/newsview?id=${newsId}`;
+                window.open(newsUrl, '_blank');
+            }
+        }
+
+        // 显示提示框
+        function showNotification() {
+            // 移除已存在的提示框
+            const existingOverlay = document.querySelector('.notification-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+            
+            // 创建遮罩层
+            const overlay = document.createElement('div');
+            overlay.className = 'notification-overlay';
+            
+            // 创建提示框
+            const notificationBox = document.createElement('div');
+            notificationBox.className = 'notification-box';
+            notificationBox.innerHTML = `
+                <div class="notification-icon">!</div>
+                <div class="notification-content">提示：开发本功能的程序员正在植发</div>
+            `;
+            
+            overlay.appendChild(notificationBox);
+            document.body.appendChild(overlay);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                closeNotification();
+            }, 3000);
+        }
+
+        // 关闭提示框
+        function closeNotification() {
+            const overlay = document.querySelector('.notification-overlay');
+            if (overlay) {
+                // 添加淡出动画
+                overlay.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            }
+        }
+
+        // 打开充值页面
+        function openRechargePage() {
+            // 阻止事件冒泡，避免触发卡片的onclick事件
+            event.stopPropagation();
+            
+            // 跳转到充值页面
+            window.open('https://app2.ceshi.cs/addfunds', '_blank');
+        }
+
+        // 加载所有数据
+        async function loadAllData() {
+            await Promise.all([
+                loadUserInfo(),
+                loadGreeting(),
+                loadGreetingImage(),
+                loadDashboardData(),
+                loadAnnouncements()
+            ]);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+        });
+    </script>
+</body>
+</html>

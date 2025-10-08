@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #202124;
+            line-height: 1.5;
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #5f6368;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            display: none;
+        }
+
+        .menu-toggle:hover {
+            background-color: #f1f3f4;
+        }
+
+        .logo {
+            height: 32px;
+            width: auto;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* 购物车按钮样式 */
+        .cart-button {
+            background: #f1f3f4;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #202124;
+        }
+
+        .cart-button:hover {
+            background: #e8eaed;
+            transform: translateY(-1px);
+        }
+
+        .cart-icon {
+            font-size: 18px;
+        }
+
+
+        /* 购物车弹出框样式 */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+
+        .cart-overlay.show {
+            display: flex;
+        }
+
+        .cart-panel {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            max-width: 90vw;
+            height: 80vh;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .cart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e8eaed;
+            background: #f8f9fa;
+        }
+
+        .cart-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+            margin: 0;
+        }
+
+        .cart-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #5f6368;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .cart-close:hover {
+            background: #e8eaed;
+        }
+
+        .cart-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .cart-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 0 0 12px 12px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .cart-panel {
+                width: 100%;
+                height: 90vh;
+                max-height: none;
+                border-radius: 12px 12px 0 0;
+                margin-top: auto;
+            }
+
+            .cart-overlay {
+                align-items: flex-end;
+                padding: 0;
+            }
+
+            @keyframes slideInRight {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            background: #f1f3f4;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .user-info:hover {
+            background: #e8eaed;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 160px;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+
+        .user-info:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #202124;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f3f4;
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4285f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* 主布局 */
+        .main-container {
+            display: flex;
+            margin-top: 64px;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            flex: 0 0 280px;
+            min-width: 200px;
+            background: #fff;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-iframe {
+            width: 100%;
+            height: calc(100vh - 64px);
+            border: none;
+            background: #f8f9fa;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            flex: 1;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-header {
+            background: #fff;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-button {
+            background: #f1f3f4;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #202124;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover {
+            background: #e8eaed;
+        }
+
+        .content-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+            margin: 0;
+        }
+
+        .content-iframe {
+            width: 100%;
+            flex: 1;
+            border: none;
+            background: #f8f9fa;
+        }
+
+
+        /* 加载状态 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 移动端隐藏logo */
+        @media (max-width: 768px) {
+            .logo {
+                display: none;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 64px;
+                height: calc(100vh - 64px);
+                z-index: 999;
+                flex: none;
+                width: 280px;
+                transform: translateX(0);
+            }
+
+            .sidebar.open {
+                transform: translateX(280px);
+            }
+
+            .main-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <img src="" alt="Logo" class="logo" id="logo">
+        </div>
+        <div class="header-right">
+            <!-- 客服按钮 -->
+            <button class="cart-button" id="supportButton" onclick="openSupport()">
+                <span class="cart-icon">💬</span>
+                <span>客服</span>
+            </button>
+            
+            <!-- 购物车按钮 -->
+            <button class="cart-button" id="cartButton" onclick="toggleCart()">
+                <span class="cart-icon">🛒</span>
+            </button>
+            
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="userId">加载中...</span>
+                <div class="user-dropdown">
+                    <div class="dropdown-item" id="logoutBtn">
+                        <span>🚪</span>
+                        <span>退出登录</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主布局 -->
+    <div class="main-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <iframe src="sidebar.html" class="sidebar-iframe"></iframe>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <div class="content-header" id="contentHeader" style="display: none;">
+                <button class="back-button" id="backButton" onclick="backToHome()">← 返回主页</button>
+                <h2 class="content-title" id="contentTitle"></h2>
+            </div>
+            <iframe src="content.html" class="content-iframe" id="contentFrame"></iframe>
+        </main>
+    </div>
+
+    <!-- 购物车弹出框 -->
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()">
+        <div class="cart-panel" id="cartPanel" onclick="event.stopPropagation()">
+            <div class="cart-header">
+                <h3 class="cart-title">购物车</h3>
+                <button class="cart-close" onclick="closeCart()">×</button>
+            </div>
+            <div class="cart-content">
+                <iframe src="cart.html" class="cart-iframe" id="cartFrame"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API配置
+        const API_BASE_URL = 'https://app2.ceshi.cs';
+        let jwtToken = localStorage.getItem('jwt_token');
+
+        // 通用API请求函数
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const config = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(jwtToken && { 'Authorization': `Bearer ${jwtToken}` })
+                },
+                ...options
+            };
+
+            try {
+                const response = await fetch(url, config);
+                const data = await response.json();
+                
+                if (data.status === 405) {
+                    redirectToLogin();
+                    throw new Error('需要登录');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('API请求失败:', error);
+                throw error;
+            }
+        }
+
+        // 跳转到登录页面
+        function redirectToLogin() {
+            window.location.href = 'https://app2.ceshi.cs/login';
+        }
+
+
+        // 退出登录
+        async function handleLogout() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/logOut`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(jwtToken && { 'Authorization': `Bearer ${jwtToken}` })
+                    }
+                });
+
+                const data = await response.json();
+                
+                // 清除本地存储的token
+                localStorage.removeItem('jwt_token');
+                jwtToken = null;
+                
+                // 重新加载页面
+                window.location.reload();
+            } catch (error) {
+                console.error('退出登录请求失败:', error);
+                // 即使请求失败，也清除本地token并重新加载
+                localStorage.removeItem('jwt_token');
+                jwtToken = null;
+                window.location.reload();
+            }
+        }
+
+        // 加载用户信息
+        async function loadUserInfo() {
+            try {
+                const data = await apiRequest('/user_info');
+                const user = data.user;
+                
+                if (user) {
+                    // 更新顶栏用户信息
+                    document.getElementById('userId').textContent = user.id || 'ID';
+                    document.getElementById('userAvatar').textContent = (user.username || 'U').charAt(0).toUpperCase();
+                    
+                    // 准备完整的用户信息
+                    const userInfo = {
+                        name: user.username || '用户',
+                        email: user.email || 'user@example.com',
+                        avatar: (user.username || 'U').charAt(0).toUpperCase()
+                    };
+                    
+                    // 更新侧边栏用户信息
+                    updateSidebarUserInfo(userInfo);
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+
+        // 加载Logo
+        async function loadLogo() {
+            try {
+                const logoUrl = `${API_BASE_URL}/upload/logo-colours.png`;
+                document.getElementById('logo').src = logoUrl;
+            } catch (error) {
+                console.error('加载Logo失败:', error);
+            }
+        }
+
+        // 切换侧边栏显示
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            const logo = document.getElementById('logo');
+            
+            sidebar.classList.toggle('open');
+            
+            // 在移动端切换按钮和logo的显示
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains('open')) {
+                    // 侧边栏打开时，隐藏按钮，显示logo
+                    menuToggle.style.display = 'none';
+                    logo.style.display = 'block';
+                } else {
+                    // 侧边栏关闭时，显示按钮，隐藏logo
+                    menuToggle.style.display = 'block';
+                    logo.style.display = 'none';
+                }
+            }
+        }
+
+        // 侧边栏页面切换
+        function switchPage(page, url) {
+            console.log('切换到页面:', page, 'URL:', url);
+            
+            if (page === 'home') {
+                // 返回主页
+                backToHome();
+            } else if (url) {
+                // 切换到指定URL
+                contentFrame.src = url;
+                contentHeader.style.display = 'block';
+                contentTitle.textContent = page;
+                
+                // 通知侧边栏设置当前项为活动状态
+                sidebarFrame.contentWindow.postMessage({
+                    type: 'setActiveNavItem',
+                    page: page
+                }, '*');
+            } else {
+                // 这里可以添加其他页面切换逻辑
+                console.log('其他页面:', page);
+            }
+        }
+
+        // 用户菜单页面切换
+        function switchUserPage(page) {
+            console.log('切换到用户页面:', page);
+            const contentFrame = document.getElementById('contentFrame');
+            const contentHeader = document.getElementById('contentHeader');
+            const contentTitle = document.getElementById('contentTitle');
+            
+            // 显示内容头部
+            contentHeader.style.display = 'flex';
+            
+            // 根据页面类型切换内容
+            switch (page) {
+                case 'details':
+                    contentFrame.src = 'https://app2.ceshi.cs/details';
+                    contentTitle.textContent = '个人信息';
+                    break;
+                case 'security':
+                    contentFrame.src = 'https://app2.ceshi.cs/security';
+                    contentTitle.textContent = '安全中心';
+                    break;
+                case 'verified':
+                    contentFrame.src = 'https://app2.ceshi.cs/verified';
+                    contentTitle.textContent = '实名认证';
+                    break;
+                default:
+                    // 默认返回主内容页面
+                    backToHome();
+            }
+        }
+
+        // 返回主页
+        function backToHome() {
+            const contentFrame = document.getElementById('contentFrame');
+            const contentHeader = document.getElementById('contentHeader');
+            
+            // 隐藏内容头部
+            contentHeader.style.display = 'none';
+            
+            // 返回主内容页面
+            contentFrame.src = 'content.html';
+            
+            // 通知侧边栏设置默认活动状态
+            const sidebarFrame = document.querySelector('.sidebar-iframe');
+            if (sidebarFrame && sidebarFrame.contentWindow) {
+                sidebarFrame.contentWindow.postMessage({
+                    type: 'setActiveNavItem',
+                    data: 'home'
+                }, '*');
+            }
+        }
+
+        // 打开用户资料
+        function openUserProfile() {
+            console.log('打开用户资料');
+            // 这里可以添加打开用户资料的逻辑
+        }
+
+        // 更新侧边栏用户信息
+        function updateSidebarUserInfo(userInfo = null) {
+            // 如果没有传入用户信息，则从当前页面获取
+            if (!userInfo) {
+                userInfo = {
+                    name: document.getElementById('userId').textContent,
+                    email: 'user@example.com',
+                    avatar: document.getElementById('userAvatar').textContent
+                };
+            }
+            
+            // 使用postMessage发送到侧边栏
+            const sidebarFrame = document.querySelector('.sidebar-iframe');
+            if (sidebarFrame && sidebarFrame.contentWindow) {
+                sidebarFrame.contentWindow.postMessage({
+                    type: 'updateUserInfo',
+                    data: userInfo
+                }, '*');
+            }
+        }
+
+        // 处理来自iframe的消息
+        function handleIframeMessage(event) {
+            if (event.data && event.data.type) {
+                switch (event.data.type) {
+                    case 'updateSidebarUserInfo':
+                        console.log('收到侧边栏用户信息更新:', event.data.data);
+                        break;
+                    case 'switchPage':
+                        switchPage(event.data.page, event.data.url);
+                        break;
+                    case 'switchUserPage':
+                        switchUserPage(event.data.data);
+                        break;
+                    case 'openUserProfile':
+                        openUserProfile();
+                        break;
+                }
+            }
+        }
+
+        // 购物车相关函数
+        function toggleCart() {
+            const cartOverlay = document.getElementById('cartOverlay');
+            cartOverlay.classList.toggle('show');
+            
+            // 如果打开购物车，刷新iframe内容
+            if (cartOverlay.classList.contains('show')) {
+                const cartFrame = document.getElementById('cartFrame');
+                // 强制刷新本地购物车页面，确保总是加载最新数据
+                cartFrame.src = 'cart.html?t=' + Date.now();
+            }
+        }
+
+        function closeCart() {
+            const cartOverlay = document.getElementById('cartOverlay');
+            cartOverlay.classList.remove('show');
+        }
+
+        // 打开客服页面
+        function openSupport() {
+            window.open('https://app2.ceshi.cs/xyy/kf/', '_blank');
+        }
+
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 监听来自iframe的消息
+            window.addEventListener('message', handleIframeMessage);
+            
+            // 绑定菜单按钮事件
+            document.getElementById('menuToggle').addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleSidebar();
+            });
+
+            // 点击侧边栏外部关闭侧边栏
+            document.addEventListener('click', function(e) {
+                const sidebar = document.querySelector('.sidebar');
+                const menuToggle = document.getElementById('menuToggle');
+                const logo = document.getElementById('logo');
+                
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    !menuToggle.contains(e.target) && 
+                    sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    // 关闭侧边栏时恢复按钮显示，隐藏logo
+                    menuToggle.style.display = 'block';
+                    logo.style.display = 'none';
+                }
+            });
+
+            // 窗口大小改变时重置侧边栏状态
+            window.addEventListener('resize', function() {
+                const sidebar = document.querySelector('.sidebar');
+                const menuToggle = document.getElementById('menuToggle');
+                const logo = document.getElementById('logo');
+                
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('open');
+                    // 桌面端时恢复正常显示
+                    menuToggle.style.display = 'none';
+                    logo.style.display = 'block';
+                } else {
+                    // 移动端时根据侧边栏状态设置显示
+                    if (sidebar.classList.contains('open')) {
+                        menuToggle.style.display = 'none';
+                        logo.style.display = 'block';
+                    } else {
+                        menuToggle.style.display = 'block';
+                        logo.style.display = 'none';
+                    }
+                }
+            });
+
+
+            // 绑定退出登录事件
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                handleLogout();
+            });
+
+            // 初始化加载数据
+            loadLogo();
+            loadUserInfo();
+            
+            // 设置侧边栏默认活动状态
+            setTimeout(() => {
+                const sidebarFrame = document.querySelector('.sidebar-iframe');
+                if (sidebarFrame && sidebarFrame.contentWindow) {
+                    sidebarFrame.contentWindow.postMessage({
+                        type: 'setActiveNavItem',
+                        data: 'home'
+                    }, '*');
+                }
+            }, 1000);
+
+            // 键盘事件监听
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeCart();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

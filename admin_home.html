@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XYY魔方拓展管理系统 - 主页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e8f5e8 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 标题栏 */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .header-btn:hover {
+            background: #1557b0;
+            transform: translateY(-1px);
+        }
+
+
+        /* 登录区域 */
+        .login-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 功能区域 */
+        .functions-section {
+            display: none;
+        }
+
+        .functions-section.show {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 20px;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 100%;
+        }
+
+        .function-item {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .function-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .function-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 12px 12px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .function-item:hover::before {
+            height: 6px;
+        }
+
+        /* 系统管理 - 绿色主题 */
+        .system-management .function-item::before {
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+        }
+
+        .system-management .function-item:hover {
+            border-color: #4caf50;
+        }
+
+        .system-management .function-icon {
+            background: #4caf50;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+        }
+
+        /* 系统工具 - 橙色主题 */
+        .system-tools .function-item::before {
+            background: linear-gradient(90deg, #ff9800, #ffb74d);
+        }
+
+        .system-tools .function-item:hover {
+            border-color: #ff9800;
+        }
+
+        .system-tools .function-icon {
+            background: #ff9800;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+        }
+
+        /* 积分管理 - 紫色主题 */
+        .points-management .function-item::before {
+            background: linear-gradient(90deg, #9c27b0, #ba68c8);
+        }
+
+        .points-management .function-item:hover {
+            border-color: #9c27b0;
+        }
+
+        .points-management .function-icon {
+            background: #9c27b0;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+        }
+
+        .function-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .functions-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .function-item {
+                padding: 20px;
+            }
+            
+            .function-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .function-name {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .functions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 错误提示 */
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* 积分管理模态框样式 */
+        .points-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .points-modal.show {
+            display: flex;
+        }
+
+        .points-modal-header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .points-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .points-modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .points-modal-btn {
+            background: #9c27b0;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .points-modal-btn:hover {
+            background: #7b1fa2;
+            transform: translateY(-1px);
+        }
+
+        .points-login-info {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            display: flex;
+            gap: 30px;
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.5s ease;
+        }
+
+        .points-login-info.minimized {
+            padding: 5px 20px;
+            font-size: 12px;
+        }
+
+        .login-info-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .login-label {
+            font-weight: 600;
+            color: #666;
+            margin-right: 5px;
+        }
+
+        .login-value {
+            color: #9c27b0;
+            font-weight: 500;
+            background: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .points-iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        /* 登录信息动画 */
+        @keyframes shrinkToCorner {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.8;
+            }
+        }
+
+        .points-login-info.animate {
+            animation: shrinkToCorner 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="header-title">工作台</h1>
+        <div class="header-actions">
+            <button class="header-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- 登录区域 -->
+        <div class="login-section" id="loginSection">
+            <div class="login-form">
+                <h2>管理员登录</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" id="password" name="password" placeholder="请输入管理员密码" required>
+                    </div>
+                    <button type="submit" class="login-btn">登录</button>
+                </form>
+                <div class="error-message" id="errorMessage"></div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button onclick="initDatabase()" style="background: #666; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 12px;">初始化数据库</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 功能区域 -->
+        <div class="functions-section" id="functionsSection">
+            <!-- 系统管理 -->
+            <div class="section system-management">
+                <h2 class="section-header">系统管理</h2>
+                <div class="functions-grid">
+                    <div class="function-item" onclick="openPage('sidebar')">
+                        <div class="function-icon">
+                            <i class="fas fa-bars"></i>
+                        </div>
+                        <div class="function-name">侧边栏管理</div>
+                    </div>
+                    <div class="function-item" onclick="openPage('announcement')">
+                        <div class="function-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="function-name">公告管理</div>
+                    </div>
+                    <div class="function-item" onclick="openPage('advertisement')">
+                        <div class="function-icon">
+                            <i class="fas fa-ad"></i>
+                        </div>
+                        <div class="function-name">广告管理</div>
+                    </div>
+                    <div class="function-item" onclick="openWechatSupport()">
+                        <div class="function-icon">
+                            <i class="fab fa-weixin"></i>
+                        </div>
+                        <div class="function-name">微信客服</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 积分管理 -->
+            <div class="section points-management">
+                <h2 class="section-header">积分管理</h2>
+                <div class="functions-grid">
+                    <div class="function-item" onclick="openPointsPage('add')">
+                        <div class="function-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="function-name">添加积分奖品</div>
+                    </div>
+                    <div class="function-item" onclick="openPointsPage('manage')">
+                        <div class="function-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div class="function-name">管理积分奖品</div>
+                    </div>
+                    <div class="function-item" onclick="openPointsPage('exchange')">
+                        <div class="function-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="function-name">兑换发货</div>
+                    </div>
+                    <div class="function-item" onclick="openPointsPage('logs')">
+                        <div class="function-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="function-name">积分管理</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 积分管理嵌入界面模态框 -->
+    <div id="pointsModal" class="points-modal">
+        <div class="points-modal-header">
+            <div class="points-modal-title">积分管理系统</div>
+            <div class="points-modal-actions">
+                <button class="points-modal-btn" onclick="refreshPointsPage()">
+                    <i class="fas fa-sync-alt"></i> 刷新
+                </button>
+                <button class="points-modal-btn" onclick="closePointsModal()">
+                    <i class="fas fa-home"></i> 返回首页
+                </button>
+            </div>
+        </div>
+        <div class="points-login-info" id="pointsLoginInfo">
+            <div class="login-info-item">
+                <span class="login-label">账号：</span>
+                <span class="login-value">JFGL</span>
+            </div>
+            <div class="login-info-item">
+                <span class="login-label">密码：</span>
+                <span class="login-value">JFadmin123</span>
+            </div>
+        </div>
+        <iframe id="pointsIframe" class="points-iframe" src=""></iframe>
+    </div>
+
+    <script>
+        let isLoggedIn = false;
+
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            setupLoginForm();
+            testLogin(); // 测试数据库状态
+            setupMessageListener(); // 设置消息监听器
+        });
+
+        // 检查登录状态
+        async function checkLoginStatus() {
+            try {
+                const response = await fetch('api.php?action=me');
+                const data = await response.json();
+                if (data && data.success) {
+                    isLoggedIn = true;
+                    showFunctions();
+                } else {
+                    showLogin();
+                }
+            } catch (e) {
+                showLogin();
+            }
+        }
+
+        // 设置登录表单
+        function setupLoginForm() {
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('password').value;
+                const errorMessage = document.getElementById('errorMessage');
+                
+                if (!password.trim()) {
+                    showError('请输入密码');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('api.php?action=login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ password: password })
+                    });
+
+                    const data = await response.json();
+                    console.log('登录响应:', data); // 添加调试信息
+                    
+                    if (data && data.success) {
+                        isLoggedIn = true;
+                        showFunctions();
+                        hideError();
+                    } else {
+                        showError(data.message || '登录失败，密码错误');
+                    }
+                } catch (e) {
+                    console.error('登录错误:', e); // 添加调试信息
+                    showError('登录失败，请重试: ' + e.message);
+                }
+            });
+        }
+
+        // 显示登录界面
+        function showLogin() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('functionsSection').classList.remove('show');
+            document.querySelector('.header-actions').style.display = 'none';
+            isLoggedIn = false;
+        }
+
+        // 显示功能界面
+        function showFunctions() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('functionsSection').classList.add('show');
+            document.querySelector('.header-actions').style.display = 'flex';
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.classList.remove('show');
+        }
+
+        // 打开页面
+        function openPage(page) {
+            if (!isLoggedIn) {
+                showError('请先登录');
+                return;
+            }
+
+            switch(page) {
+                case 'sidebar':
+                    window.location.href = 'admin.html?view=sidebar';
+                    break;
+                case 'announcement':
+                    window.location.href = 'admin.html?view=announcement';
+                    break;
+                case 'advertisement':
+                    window.location.href = 'admin.html?view=advertisement';
+                    break;
+                case 'password':
+                    window.location.href = 'admin.html?view=password';
+                    break;
+            }
+        }
+
+        // 打开微信客服
+        function openWechatSupport() {
+            window.open('https://kf.weixin.qq.com/', '_blank');
+        }
+
+        // 刷新系统
+        async function refreshSystem() {
+            if (!isLoggedIn) {
+                showError('请先登录');
+                return;
+            }
+            
+            try {
+                const response = await fetch('api.php?action=getSidebarData');
+                const data = await response.json();
+                if (data && data.success) {
+                    alert('系统刷新成功');
+                } else {
+                    alert('系统刷新失败');
+                }
+            } catch (e) {
+                alert('系统刷新失败');
+            }
+        }
+
+        // 保存所有配置
+        async function saveAll() {
+            if (!isLoggedIn) {
+                showError('请先登录');
+                return;
+            }
+            
+            alert('所有配置已保存');
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出系统吗？')) {
+                // 清除session
+                fetch('api.php?action=logout', { method: 'POST' })
+                    .then(() => {
+                        isLoggedIn = false;
+                        showLogin();
+                        document.getElementById('password').value = '';
+                        hideError();
+                    });
+            }
+        }
+
+        // 初始化数据库
+        async function initDatabase() {
+            try {
+                const response = await fetch('install_extras.php', { method: 'POST' });
+                const data = await response.json();
+                if (data && data.success) {
+                    showError('数据库初始化成功！现在可以使用默认密码 XYYadmin 登录');
+                } else {
+                    showError('数据库初始化失败: ' + (data.message || '未知错误'));
+                }
+            } catch (e) {
+                showError('数据库初始化失败: ' + e.message);
+            }
+        }
+
+        // 测试登录状态
+        async function testLogin() {
+            try {
+                const response = await fetch('api.php?action=get');
+                const data = await response.json();
+                console.log('数据库连接测试结果:', data);
+                if (!data.success && data.message === '数据库未连接') {
+                    showError('数据库未连接，将使用离线模式登录');
+                }
+            } catch (e) {
+                console.error('测试数据库连接失败:', e);
+                showError('无法连接到服务器，将使用离线模式登录');
+            }
+        }
+
+        // 积分管理相关变量
+        let pointsModalOpen = false;
+        let urlCheckInterval = null;
+        let currentPointsUrl = '';
+
+        // 积分管理页面URL映射
+        const pointsUrls = {
+            'add': 'https://app2.ceshi.cs/admin123/addons?_plugin=points_mall&_controller=admin_index&_action=add&languagesys=CN',
+            'manage': 'https://app2.ceshi.cs/admin123/addons?_plugin=points_mall&_controller=admin_index&_action=showprizes&languagesys=CN',
+            'exchange': 'https://app2.ceshi.cs/admin123/addons?_plugin=points_mall&_controller=admin_index&_action=exchange&languagesys=CN',
+            'logs': 'https://app2.ceshi.cs/admin123/addons?_plugin=points_mall&_controller=admin_index&_action=logs&languagesys=CN'
+        };
+
+        // 嵌入页面初始URL
+        const embedUrl = 'https://app2.ceshi.cs/admin123/#/login';
+
+        // 打开积分管理页面
+        function openPointsPage(type) {
+            if (!isLoggedIn) {
+                showError('请先登录');
+                return;
+            }
+
+            // 显示登录信息提示
+            showLoginInfoAlert();
+
+            // 设置当前URL
+            currentPointsUrl = pointsUrls[type];
+            
+            // 显示模态框
+            const modal = document.getElementById('pointsModal');
+            const iframe = document.getElementById('pointsIframe');
+            const loginInfo = document.getElementById('pointsLoginInfo');
+            
+            // 重置登录信息样式
+            loginInfo.classList.remove('minimized', 'animate');
+            
+            // 设置iframe源为登录页面
+            iframe.src = embedUrl;
+            
+            // 显示模态框
+            modal.classList.add('show');
+            pointsModalOpen = true;
+            
+            // 开始URL检查
+            startUrlCheck();
+        }
+
+        // 显示登录信息提示
+        function showLoginInfoAlert() {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 2000;
+                text-align: center;
+                font-size: 16px;
+                max-width: 400px;
+            `;
+            alertDiv.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <i class="fas fa-info-circle" style="font-size: 24px; color: #4CAF50;"></i>
+                </div>
+                <div style="margin-bottom: 10px; font-weight: bold;">积分管理系统登录信息</div>
+                <div style="margin-bottom: 5px;">账号：<strong>JFGL</strong></div>
+                <div style="margin-bottom: 15px;">密码：<strong>JFadmin123</strong></div>
+                <div style="font-size: 14px; color: #ccc;">登录信息已显示在页面顶部</div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // 3秒后自动关闭提示
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 3000);
+        }
+
+        // 开始URL检查
+        function startUrlCheck() {
+            if (urlCheckInterval) {
+                clearInterval(urlCheckInterval);
+            }
+            
+            // 立即检查一次
+            checkIframeUrl();
+            
+            // 然后每5秒检查一次
+            urlCheckInterval = setInterval(() => {
+                checkIframeUrl();
+            }, 5000);
+        }
+
+        // 检查iframe URL
+        function checkIframeUrl() {
+            const iframe = document.getElementById('pointsIframe');
+            try {
+                // 尝试获取iframe的URL
+                const iframeUrl = iframe.contentWindow.location.href;
+                console.log('当前iframe URL:', iframeUrl);
+                
+                // 检查是否还在登录页面
+                if (iframeUrl.includes('https://app2.ceshi.cs/admin123/#/login')) {
+                    console.log('仍在登录页面，继续等待...');
+                    return;
+                }
+                
+                // 如果URL不是登录页面，说明登录成功
+                if (iframeUrl.includes('https://app2.ceshi.cs/admin123/')) {
+                    console.log('检测到域名变化，登录成功！');
+                    handleLoginSuccess();
+                }
+            } catch (e) {
+                // 跨域错误，无法直接获取URL
+                console.log('跨域限制，无法直接获取URL，尝试其他方法...');
+                
+                // 尝试通过postMessage通信
+                try {
+                    iframe.contentWindow.postMessage('checkUrl', 'https://app2.ceshi.cs');
+                } catch (postError) {
+                    console.log('postMessage也失败，使用备用检测方法');
+                    // 备用方法：检查iframe是否加载完成且不在登录页面
+                    if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                        // 延迟检查，给页面时间加载
+                        setTimeout(() => {
+                            checkIframeContent();
+                        }, 2000);
+                    }
+                }
+            }
+        }
+
+        // 备用检测方法：检查iframe内容
+        function checkIframeContent() {
+            const iframe = document.getElementById('pointsIframe');
+            try {
+                // 检查iframe内容中是否包含登录相关元素
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const loginElements = iframeDoc.querySelectorAll('input[type="password"], .login-form, .login-container');
+                
+                if (loginElements.length === 0) {
+                    // 没有找到登录元素，可能已经登录成功
+                    console.log('未找到登录元素，可能已登录成功');
+                    handleLoginSuccess();
+                } else {
+                    console.log('仍存在登录元素，继续等待...');
+                }
+            } catch (e) {
+                console.log('无法检查iframe内容，继续等待...');
+            }
+        }
+
+        // 处理登录成功
+        function handleLoginSuccess() {
+            if (urlCheckInterval) {
+                clearInterval(urlCheckInterval);
+                urlCheckInterval = null;
+            }
+            
+            // 显示登录成功提示
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(76, 175, 80, 0.9);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 2000;
+                text-align: center;
+                font-size: 16px;
+                max-width: 300px;
+            `;
+            successDiv.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <i class="fas fa-check-circle" style="font-size: 24px;"></i>
+                </div>
+                <div style="margin-bottom: 10px; font-weight: bold;">登录成功！</div>
+                <div style="font-size: 14px;">接下来为您跳转...</div>
+            `;
+            
+            document.body.appendChild(successDiv);
+            
+            // 2秒后关闭模态框并打开新窗口
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.parentNode.removeChild(successDiv);
+                }
+                closePointsModal();
+                window.open(currentPointsUrl, '_blank');
+            }, 2000);
+        }
+
+        // 刷新积分页面
+        function refreshPointsPage() {
+            const iframe = document.getElementById('pointsIframe');
+            iframe.src = iframe.src;
+        }
+
+        // 关闭积分管理模态框
+        function closePointsModal() {
+            const modal = document.getElementById('pointsModal');
+            const iframe = document.getElementById('pointsIframe');
+            const loginInfo = document.getElementById('pointsLoginInfo');
+            
+            // 停止URL检查
+            if (urlCheckInterval) {
+                clearInterval(urlCheckInterval);
+                urlCheckInterval = null;
+            }
+            
+            // 隐藏模态框
+            modal.classList.remove('show');
+            pointsModalOpen = false;
+            
+            // 清空iframe
+            iframe.src = '';
+            
+            // 重置登录信息样式
+            loginInfo.classList.remove('minimized', 'animate');
+        }
+
+        // 设置消息监听器
+        function setupMessageListener() {
+            window.addEventListener('message', function(event) {
+                // 只接受来自目标域名的消息
+                if (event.origin !== 'https://app2.ceshi.cs') {
+                    return;
+                }
+                
+                console.log('收到iframe消息:', event.data);
+                
+                // 处理URL变化消息
+                if (event.data && event.data.type === 'urlChange') {
+                    const newUrl = event.data.url;
+                    console.log('iframe URL变化:', newUrl);
+                    
+                    // 检查是否还在登录页面
+                    if (newUrl.includes('#/login')) {
+                        console.log('仍在登录页面');
+                        return;
+                    }
+                    
+                    // 如果不在登录页面，说明登录成功
+                    if (newUrl.includes('admin123/')) {
+                        console.log('检测到登录成功，URL:', newUrl);
+                        handleLoginSuccess();
+                    }
+                }
+            });
+        }
+
+        // 页面卸载时清理定时器
+        window.addEventListener('beforeunload', function() {
+            if (urlCheckInterval) {
+                clearInterval(urlCheckInterval);
+            }
+        });
+    </script>
+</body>
+</html>
