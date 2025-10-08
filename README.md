@@ -1,5 +1,7 @@
 # 🚀 XYYmfPro — 轩逸云魔方财务拓展页面
 
+![男娘：傻逼deepsleep](https://aliyun-oss-bucket.d-dos.cc/%E7%94%B7%E5%A8%98%E9%AA%82deepsleep.png)
+
 ## 简介
 
 XYYmfPro 是一个基于 **智简魔方财务系统** 的前端功能拓展项目。
@@ -116,4 +118,5 @@ XYYmfpro-main/
 
 博客：[黯の小站](https://www.an25.asia)
 云：[轩逸云](https://app1.xuanyiy.cn)
+
 
